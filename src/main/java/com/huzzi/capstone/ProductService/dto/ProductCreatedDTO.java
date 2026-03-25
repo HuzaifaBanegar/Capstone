@@ -1,14 +1,13 @@
-package com.huzzi.capstone.ProductService.model;
+package com.huzzi.capstone.ProductService.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class Product extends BaseModel{
+public class ProductCreatedDTO {
+    private Long id;
     private String title;
     private String description;
     private Float price;
-    private Category category;
-    private String image;
 }

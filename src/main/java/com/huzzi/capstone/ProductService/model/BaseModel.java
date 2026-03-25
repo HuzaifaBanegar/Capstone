@@ -10,8 +10,8 @@ import java.util.Date;
 @Setter
 
 public class BaseModel {
-    Long id;
-    Date created_at;
-    Date updated_at;
-    Boolean isDeleted;
+    private Long id;
+    private Date created_at ;
+    private Date updated_at ;
+    private Boolean isDeleted = false;
 }

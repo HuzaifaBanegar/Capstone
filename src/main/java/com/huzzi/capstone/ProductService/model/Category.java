@@ -1,6 +1,10 @@
 package com.huzzi.capstone.ProductService.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Category extends BaseModel{
-    String id;
-    String name;
+    private String name;
 }
