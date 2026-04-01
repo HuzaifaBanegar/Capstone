@@ -1,4 +1,4 @@
-package com.huzzi.capstone.Utils.advice.configurations;
+package com.huzzi.capstone.Utils.configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
