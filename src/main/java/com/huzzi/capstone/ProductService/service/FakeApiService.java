@@ -2,11 +2,14 @@ package com.huzzi.capstone.ProductService.service;
 
 import com.huzzi.capstone.ProductService.dto.FakeStoreDto;
 import com.huzzi.capstone.ProductService.dto.ProductCreatedDTO;
+import com.huzzi.capstone.ProductService.errorhandler.ExternalApiException;
 import com.huzzi.capstone.ProductService.errorhandler.ProductNotFoundException;
 import com.huzzi.capstone.ProductService.model.Product;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +59,29 @@ public class FakeApiService implements ProductService{
 
         return productCreatedDTO;
 
+    }
+
+    @Override
+    public Product deleteProduct(Long id) throws ProductNotFoundException {
+        try {
+            ResponseEntity<FakeStoreDto> response = restTemplate.exchange(
+                    "https://fakestoreapi.com/products/" + id,
+                    HttpMethod.DELETE,
+                    null,
+                    FakeStoreDto.class
+            );
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                return response.getBody().toProduct();
+            }
+        } catch (RestClientResponseException e) {
+            throw new ExternalApiException(
+                    "Fake Store API delete failed with status " + e.getStatusCode().value(),
+                    e.getStatusCode().value()
+            );
+        }
+
+        throw new ProductNotFoundException("Product not found");
     }
 
 

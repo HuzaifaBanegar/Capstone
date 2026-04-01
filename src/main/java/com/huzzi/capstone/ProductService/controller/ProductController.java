@@ -5,6 +5,7 @@ import com.huzzi.capstone.ProductService.errorhandler.ProductNotFoundException;
 import com.huzzi.capstone.ProductService.model.Product;
 import com.huzzi.capstone.ProductService.service.ProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,5 +33,10 @@ public class ProductController {
     @PostMapping("/products")
     public ProductCreatedDTO createProduct(String title, String description, Float price, String image, String category) {
        return productService.createProduct(title, description, price, image, category);
+    }
+
+    @DeleteMapping("/products/{id}")
+    public Product deleteProduct(@PathVariable("id") Long id) throws ProductNotFoundException {
+        return productService.deleteProduct(id);
     }
 }

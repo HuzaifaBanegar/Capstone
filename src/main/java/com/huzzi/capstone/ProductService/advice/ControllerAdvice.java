@@ -1,6 +1,7 @@
 package com.huzzi.capstone.ProductService.advice;
 
 import com.huzzi.capstone.ProductService.dto.ErrorDTO;
+import com.huzzi.capstone.ProductService.errorhandler.ExternalApiException;
 import com.huzzi.capstone.ProductService.errorhandler.ProductNotFoundException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -15,5 +16,13 @@ public class ControllerAdvice {
         errorDTO.setStatus(404);
         ResponseEntity<ErrorDTO> responseEntity = new ResponseEntity<>(errorDTO, HttpStatusCode.valueOf(404));
         return responseEntity;
+    }
+
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<ErrorDTO> handleExternalApiException(ExternalApiException e) {
+        ErrorDTO errorDTO = new ErrorDTO();
+        errorDTO.setMessage(e.getMessage());
+        errorDTO.setStatus(e.getStatusCode());
+        return new ResponseEntity<>(errorDTO, HttpStatusCode.valueOf(e.getStatusCode()));
     }
 }
