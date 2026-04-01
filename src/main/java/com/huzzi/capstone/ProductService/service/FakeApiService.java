@@ -5,6 +5,7 @@ import com.huzzi.capstone.ProductService.dto.ProductCreatedDTO;
 import com.huzzi.capstone.ProductService.errorhandler.ExternalApiException;
 import com.huzzi.capstone.ProductService.errorhandler.ProductNotFoundException;
 import com.huzzi.capstone.ProductService.model.Product;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,42 +23,63 @@ public class FakeApiService implements ProductService{
     }
     @Override
     public Product getProductById(Long id) throws ProductNotFoundException {
-        ResponseEntity<FakeStoreDto> response = restTemplate.getForEntity("https://fakestoreapi.com/products/" + id, FakeStoreDto.class);
-        System.out.println("Response for id "+id+" is: "+ response.getBody());
-        if(response.getStatusCode().is2xxSuccessful() && response.getBody() != null){
-            return response.getBody().toProduct();
+        try {
+            ResponseEntity<FakeStoreDto> response = restTemplate.getForEntity("https://fakestoreapi.com/products/" + id, FakeStoreDto.class);
+            System.out.println("Response for id " + id + " is: " + response.getBody());
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                return response.getBody().toProduct();
+            }
+            throw new ProductNotFoundException("Product not found");
+        }catch (RestClientResponseException e){
+            throw new ExternalApiException(
+                    "Fake Store API get failed with status " + e.getStatusCode().value(),
+                    e.getStatusCode().value()
+            );
         }
-        throw new ProductNotFoundException("Product not found");
     }
 
     @Override
     public List<Product> getAllProducts() throws ProductNotFoundException {
-        FakeStoreDto[] products = restTemplate.getForObject("https://fakestoreapi.com/products", FakeStoreDto[].class);
-        List<Product> productList = new ArrayList<>();
-        for (FakeStoreDto product : products) {
-            productList.add(product.toProduct());
-        }
+        try {
+            FakeStoreDto[] products = restTemplate.getForObject("https://fakestoreapi.com/products", FakeStoreDto[].class);
+            List<Product> productList = new ArrayList<>();
+            for (FakeStoreDto product : products) {
+                productList.add(product.toProduct());
+            }
 
-        if(productList != null && productList.size() > 0){
-            return productList;
-        }
+            if (productList != null && productList.size() > 0) {
+                return productList;
+            }
 
-        throw new ProductNotFoundException("Products not found");
+            throw new ProductNotFoundException("Products not found");
+        }catch (RestClientResponseException e){
+            throw new ExternalApiException(
+                    "Fake Store API get failed with status " + e.getStatusCode().value(),
+                    e.getStatusCode().value()
+            );
+        }
 
     }
 
     @Override
     public ProductCreatedDTO createProduct(String title, String description, Float price, String image, String category) {
-        ProductCreatedDTO productCreatedDTO = new ProductCreatedDTO();
-        productCreatedDTO.setTitle(title);
-        productCreatedDTO.setDescription(description);
-        productCreatedDTO.setPrice(price);
+        try {
+            ProductCreatedDTO productCreatedDTO = new ProductCreatedDTO();
+            productCreatedDTO.setTitle(title);
+            productCreatedDTO.setDescription(description);
+            productCreatedDTO.setPrice(price);
 
-        FakeStoreDto response = restTemplate.postForObject("https://fakestoreapi.com/products", productCreatedDTO, FakeStoreDto.class);
+            FakeStoreDto response = restTemplate.postForObject("https://fakestoreapi.com/products", productCreatedDTO, FakeStoreDto.class);
 
-        productCreatedDTO.setId(response.toProduct().getId());
+            productCreatedDTO.setId(response.toProduct().getId());
 
-        return productCreatedDTO;
+            return productCreatedDTO;
+        }catch (RestClientResponseException e){
+            throw new ExternalApiException(
+                    "Fake Store API create failed with status " + e.getStatusCode().value(),
+                    e.getStatusCode().value()
+            );
+        }
 
     }
 
@@ -82,6 +104,38 @@ public class FakeApiService implements ProductService{
         }
 
         throw new ProductNotFoundException("Product not found");
+    }
+
+    @Override
+    public Product updateProduct(Long id, String title, String description, Float price, String image, String category) throws ProductNotFoundException {
+        FakeStoreDto fakeStoreProduct = new FakeStoreDto();
+        fakeStoreProduct.setId(id.intValue());
+        fakeStoreProduct.setTitle(title);
+        fakeStoreProduct.setDescription(description);
+        fakeStoreProduct.setPrice(price);
+        fakeStoreProduct.setImage(image);
+        fakeStoreProduct.setCategory(category);
+
+        HttpEntity<FakeStoreDto> requestEntity = new HttpEntity<>(fakeStoreProduct);
+        try {
+            ResponseEntity<FakeStoreDto> response = restTemplate.exchange(
+                    "https://fakestoreapi.com/products/" + id,
+                    HttpMethod.PUT,
+                    requestEntity,
+                    FakeStoreDto.class
+            );
+            if(response.getStatusCode().is2xxSuccessful() && response.getBody() != null){
+                return response.getBody().toProduct();
+            }else if(response.getBody() == null){
+                throw new ProductNotFoundException("Product not found");
+            }
+        }catch (RestClientResponseException e){
+            throw new ExternalApiException(
+                    "Fake Store API update failed with status " + e.getStatusCode().value(),
+                    e.getStatusCode().value()
+            );
+        }
+        return null;
     }
 
 

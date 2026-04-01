@@ -1,15 +1,12 @@
 package com.huzzi.capstone.ProductService.controller;
 
+import com.huzzi.capstone.ProductService.dto.FakeStoreDto;
 import com.huzzi.capstone.ProductService.dto.ProductCreatedDTO;
 import com.huzzi.capstone.ProductService.errorhandler.ProductNotFoundException;
 import com.huzzi.capstone.ProductService.model.Product;
 import com.huzzi.capstone.ProductService.service.ProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,5 +35,10 @@ public class ProductController {
     @DeleteMapping("/products/{id}")
     public Product deleteProduct(@PathVariable("id") Long id) throws ProductNotFoundException {
         return productService.deleteProduct(id);
+    }
+
+    @PatchMapping("/products/{id}")
+    public Product updateProduct(@PathVariable("id") Long id, FakeStoreDto fakeStoreProduct) throws ProductNotFoundException {
+        return productService.updateProduct(id, fakeStoreProduct.getTitle(), fakeStoreProduct.getDescription(), fakeStoreProduct.getPrice(), fakeStoreProduct.getImage(), fakeStoreProduct.getCategory());
     }
 }

@@ -11,4 +11,5 @@ public interface ProductService {
     public List<Product> getAllProducts() throws ProductNotFoundException;
     public ProductCreatedDTO createProduct(String title, String description, Float price, String image, String category);
     public Product deleteProduct(Long id) throws ProductNotFoundException;
+    public Product updateProduct(Long id, String title, String description, Float price, String image, String category) throws ProductNotFoundException;
 }
