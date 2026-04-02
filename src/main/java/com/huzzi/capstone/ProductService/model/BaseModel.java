@@ -17,7 +17,7 @@ public class BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Date created_at ;
+    private Date created_at = new Date() ;
     private Date updated_at ;
     private Boolean isDeleted = false;
 }

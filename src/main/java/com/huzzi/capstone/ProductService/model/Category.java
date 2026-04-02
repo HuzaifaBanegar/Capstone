@@ -1,6 +1,7 @@
 package com.huzzi.capstone.ProductService.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
@@ -15,6 +16,7 @@ import java.util.List;
 @Setter
 @Entity
 public class Category extends BaseModel{
+    @Column(unique = true, nullable = false)
     private String name;
     @OneToMany( mappedBy = "category", fetch = FetchType.EAGER) // Making fetch type Eager, by default it is Lazy
     @JsonIgnore

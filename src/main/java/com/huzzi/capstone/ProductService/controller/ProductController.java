@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 public class ProductController {
     private ProductService productService;
-    public ProductController(@Qualifier("fakeApi") ProductService productService){
+    public ProductController(@Qualifier("dbproductservice") ProductService productService){
         this.productService = productService;
     }
 
@@ -28,8 +28,14 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public ProductCreatedDTO createProduct(String title, String description, Float price, String image, String category) {
-       return productService.createProduct(title, description, price, image, category);
+    public ProductCreatedDTO createProduct(@RequestBody FakeStoreDto fakeStoreProduct) {
+       return productService.createProduct(
+               fakeStoreProduct.getTitle(),
+               fakeStoreProduct.getDescription(),
+               fakeStoreProduct.getPrice(),
+               fakeStoreProduct.getImage(),
+               fakeStoreProduct.getCategory()
+       );
     }
 
     @DeleteMapping("/products/{id}")
@@ -38,7 +44,7 @@ public class ProductController {
     }
 
     @PatchMapping("/products/{id}")
-    public Product updateProduct(@PathVariable("id") Long id, FakeStoreDto fakeStoreProduct) throws ProductNotFoundException {
+    public Product updateProduct(@PathVariable("id") Long id, @RequestBody FakeStoreDto fakeStoreProduct) throws ProductNotFoundException {
         return productService.updateProduct(id, fakeStoreProduct.getTitle(), fakeStoreProduct.getDescription(), fakeStoreProduct.getPrice(), fakeStoreProduct.getImage(), fakeStoreProduct.getCategory());
     }
 }
