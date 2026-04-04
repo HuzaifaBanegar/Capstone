@@ -1,5 +1,6 @@
 package com.huzzi.capstone.Utils.advice;
 
+import com.huzzi.capstone.AuthService.errorhandler.AuthException;
 import com.huzzi.capstone.ProductService.dto.ErrorDTO;
 import com.huzzi.capstone.ProductService.errorhandler.ExternalApiException;
 import com.huzzi.capstone.ProductService.errorhandler.ProductNotFoundException;
@@ -29,6 +30,14 @@ public class ControllerAdvice {
 
     @ExceptionHandler(ExternalApiException.class)
     public ResponseEntity<ErrorDTO> handleExternalApiException(ExternalApiException e) {
+        ErrorDTO errorDTO = new ErrorDTO();
+        errorDTO.setMessage(e.getMessage());
+        errorDTO.setStatus(e.getStatusCode());
+        return new ResponseEntity<>(errorDTO, HttpStatusCode.valueOf(e.getStatusCode()));
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorDTO> handleAuthException(AuthException e) {
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setMessage(e.getMessage());
         errorDTO.setStatus(e.getStatusCode());
