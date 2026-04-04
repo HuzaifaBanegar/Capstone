@@ -1,5 +1,6 @@
 package com.huzzi.capstone.UserService.dto;
 
+import com.huzzi.capstone.UserService.model.Role;
 import com.huzzi.capstone.UserService.model.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +12,8 @@ public class UserDto {
     private String email;
     private String username;
     private String password;
-    private String name;
-    private String address;
-    private String phone;
+    private Role role;
+
 
     public User toUser() {
         User user = new User();
@@ -23,9 +23,7 @@ public class UserDto {
         user.setEmail(getEmail());
         user.setUsername(getUsername());
         user.setPassword(getPassword());
-        user.setName(getName());
-        user.setAddress(getAddress());
-        user.setPhone(getPhone());
+        user.setRole(getRole());
 
         return user;
     }

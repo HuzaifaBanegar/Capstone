@@ -3,9 +3,11 @@ package com.huzzi.capstone.UserService.service;
 import com.huzzi.capstone.ProductService.errorhandler.ExternalApiException;
 import com.huzzi.capstone.UserService.dto.UserDto;
 import com.huzzi.capstone.UserService.errorhandler.UserNotFoundException;
+import com.huzzi.capstone.UserService.model.Role;
 import com.huzzi.capstone.UserService.model.User;
 import com.huzzi.capstone.UserService.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Date;
@@ -16,8 +18,10 @@ import java.util.Optional;
 public class DbUserService implements UserService {
 
     UserRepository userRepository;
-    public  DbUserService(UserRepository userRepository) {
+    private final BCryptPasswordEncoder passwordEncoder;
+    public  DbUserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -57,12 +61,12 @@ public class DbUserService implements UserService {
     public User createUser(UserDto userDto) {
         try{
             User user = new User();
-            user.setName(userDto.getName());
             user.setEmail(userDto.getEmail());
             user.setUsername(userDto.getUsername());
-            user.setPassword(userDto.getPassword());
-            user.setAddress(userDto.getAddress());
-            user.setPhone(userDto.getPhone());
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            if(userDto.getRole().equals(Role.USER) || userDto.getRole().equals(Role.ADMIN)){
+                user.setRole(userDto.getRole());
+            }
 
             return userRepository.save(user);
         }catch (RestClientResponseException e){
@@ -98,13 +102,16 @@ public class DbUserService implements UserService {
             Optional<User> user = userRepository.findByIdAndIsDeletedFalse(id);
             if(user.isPresent()){
                 User existingUser = user.get();
-                existingUser.setName(userDto.getName());
                 existingUser.setEmail(userDto.getEmail());
                 existingUser.setUsername(userDto.getUsername());
-                existingUser.setPassword(userDto.getPassword());
-                existingUser.setAddress(userDto.getAddress());
-                existingUser.setPhone(userDto.getPhone());
+                if (userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
+                    existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
+                }
                 existingUser.setUpdated_at(new Date());
+                if(userDto.getRole().equals(Role.USER) || userDto.getRole().equals(Role.ADMIN)){
+                    existingUser.setRole(userDto.getRole());
+                }
+
                 return userRepository.save(existingUser);
             }
             throw new UserNotFoundException("User not found");

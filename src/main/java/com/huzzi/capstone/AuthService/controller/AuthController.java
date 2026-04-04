@@ -1,8 +1,7 @@
 package com.huzzi.capstone.AuthService.controller;
 
-import com.huzzi.capstone.AuthService.dto.AuthResponseDto;
-import com.huzzi.capstone.AuthService.dto.SignoutRequestDto;
-import com.huzzi.capstone.AuthService.dto.SignoutResponseDto;
+import com.huzzi.capstone.AuthService.dto.LoginResponseDto;
+import com.huzzi.capstone.AuthService.dto.LogoutRequestDto;
 import com.huzzi.capstone.AuthService.modal.Auth;
 import com.huzzi.capstone.AuthService.service.AuthService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,12 +18,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthResponseDto login(@RequestBody Auth userAuth) {
-        return authService.login(userAuth);
+    public LoginResponseDto auth(@RequestBody Auth userAuth) {
+        return authService.auth(userAuth);
     }
 
-    @PostMapping("/signout")
-    public SignoutResponseDto signout(@RequestBody SignoutRequestDto signoutRequestDto) {
-        return authService.signout(signoutRequestDto.getAccessToken());
+    @PostMapping("/logout")
+    public String logout(@RequestBody LogoutRequestDto logoutRequestDto) {
+        authService.logout(logoutRequestDto.getTokenValue());
+        return "Logged out successfully";
     }
 }
